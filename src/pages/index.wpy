@@ -1,0 +1,65 @@
+<style lang="less">
+  .page-avatar {
+    padding-top: 80px;
+    padding-bottom: 0px;
+  }
+  .avatar-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .avatar-item {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid #E5E5E5;
+      box-shadow: 0 0 0 5px hsla(0,0%,100%,.1), 0 0 5px 4px rgba(0,0,0,.1);
+      padding:10px;
+      .avatar {
+        border-radius: 50%;
+        border: 1px solid #E5E5E5;
+      }
+    }
+  }
+  .navbar-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    .navbar-item {
+      margin: 5px;
+      padding: 5px 20px;
+      text-align: center;
+      color: #666
+    }
+  }
+</style>
+<template>
+  <view class="page">
+    <view class="page__hd page-avatar">
+      <view class="weui-panel__bd avatar-box">
+        <view class="avatar-item">
+          <image class="weui-media-box__thumb avatar" src="https://lccdn.phphub.org/uploads/avatars/24929_1529996824.gif?imageView2/1/w/200/h/200"></image>
+        </view>
+      </view>
+    </view>
+    <view class="page__hd navbar-box">
+      <div class="navbar-item">
+        <navigator class="" url="articles/index" open-type="switchTab">Bolg</navigator>
+      </div>
+      <div class="navbar-item">
+        <navigator class="" url="me/index">About Me</navigator>
+      </div>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'xkeyi'
+    }
+  }
+</script>

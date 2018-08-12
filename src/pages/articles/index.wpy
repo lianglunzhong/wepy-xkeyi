@@ -1,0 +1,20 @@
+<style lang="less">
+
+</style>
+<template>
+  <view class="page">
+    <view class="page__hd">
+      this is article index page
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class ArticleIndex extends wepy.page {
+    config = {
+      navigationBarTitleText: 'xkeyi'
+    }
+  }
+</script>
