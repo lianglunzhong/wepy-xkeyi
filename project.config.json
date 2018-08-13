@@ -1,13 +1,15 @@
 {
-  "description": "xkeyi blog",
-  "setting": {
-    "urlCheck": true,
-    "es6": false,
-    "postcss": false,
-    "minified": false
-  },
-  "compileType": "miniprogram",
-  "appid": "wx82d9dc884ab27048",
-  "projectname": "xkeyi",
-  "miniprogramRoot": "./dist"
+	"description": "xkeyi blog",
+	"setting": {
+		"urlCheck": false,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx82d9dc884ab27048",
+	"projectname": "xkeyi",
+	"miniprogramRoot": "./dist",
+	"condition": {}
 }

@@ -14,7 +14,8 @@
 
   export default class UsersIndex extends wepy.page {
     config = {
-      navigationBarTitleText: 'xkeyi'
+      navigationBarTitleText: 'xkeyi',
+      navigationBarBackgroundColor: '#fafafa'
     }
   }
 </script>

@@ -14,7 +14,8 @@
 
   export default class MeIndex extends wepy.page {
     config = {
-      navigationBarTitleText: 'xkeyi'
+      navigationBarTitleText: 'xkeyi',
+      navigationBarBackgroundColor: '#fafafa'
     }
   }
 </script>
