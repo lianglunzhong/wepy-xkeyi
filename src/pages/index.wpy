@@ -1,4 +1,10 @@
 <style lang="less">
+  .page {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #ffffff;
+  }
   .page-avatar {
     padding-top: 80px;
     padding-bottom: 0px;
@@ -59,7 +65,27 @@
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: 'xkeyi'
+      navigationBarTitleText: 'xkeyi',
+      navigationBarBackgroundColor: '#fafafa'
+    }
+
+    onShareAppMessage (res) {
+      return {
+        // 标题
+        title: 'xkeyi',
+        // 路径为用户详情
+        path: '/pages/index/',
+        // 图片为用户头像
+        // imageUrl: '',
+        success: function(res) {
+          // 转发成功
+          console.log(res)
+        },
+        fail: function(res) {
+          // 转发失败
+          console.log(res)
+        }
+      }
     }
   }
 </script>

@@ -63,6 +63,7 @@ export default class extends wepy.app {
         selectedIconPath: 'images/user_selected.png'
       }],
       color: '#707070',
+      backgroundColor: '#ffffff',
       selectedColor: '#00b5ad'
     }
   }
