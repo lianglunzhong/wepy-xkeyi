@@ -10,6 +10,7 @@
         opacity: 0.8;
         width:100%;
         height:100%;
+        z-index:999;
     }
   }
   .weui-cell {
@@ -48,7 +49,45 @@
         width:100%;
         height:100%;
         background-color: #000;
+        z-index:999;
     }
+  }
+  /* 文章列表*/
+  .weui-media-box__info__meta {
+    margin: 0;
+    font-size: 12px;
+  }
+  .article-info {
+    margin-top: 5px;
+    .right-space {
+      padding-right:20px;
+    }
+  }
+  .article-title {
+    white-space: normal;
+    font-size: 14px;
+  }
+  .article-desc {
+    margin-top: 10px;
+  }
+  .weui-media-box__hd_in-appmsg {
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+  }
+  .avatar {
+    padding:4px;
+    border:1px solid #ddd;
+    border-radius:4px;
+    width:70px;
+    height:70px;
+  }
+  .weui-media-box__info__meta_icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -2px;
+    width:18px;
+    height:18px;
   }
 </style>
 <template>
@@ -72,8 +111,48 @@
         </view>
       </view>
     </view>
-    <view class="page__hd">
-      this is article index page
+    <view class="articles-list">
+      <view class="weui-panel weui-panel_access">
+        <view class="weui-panel__bd">
+          <repeat for="{{ articles }}" wx:key="id" index="index" item="article">
+            <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                    <image class="weui-media-box__thumb avatar" src="{{ article.image_url }}" />
+                </view>
+                <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                    <view class="weui-media-box__title article-title">{{ article.title }}</view>
+                    <!-- <view class="weui-media-box__desc article-desc">
+                      <rich-text nodes="{{ article.body }}"></rich-text>
+                    </view> -->
+                    <view class="weui-media-box__info article-info">
+                      <view class="weui-media-box__info__meta right-space">
+                        <image class="weui-media-box__info__meta_icon" src="/images/cate.png"/>
+                        {{ article.category.name }}
+                      </view>
+                      <view class="weui-media-box__info__meta">
+                        <image class="weui-media-box__info__meta_icon" src="/images/user.png"/>
+                        {{ article.user.name }}
+                      </view>
+                    </view>
+                    <view class="weui-media-box__info article-info">
+                      <view class="weui-media-box__info__meta right-space">
+                        <image class="weui-media-box__info__meta_icon" src="/images/date.png"/>
+                        {{ article.updated_at_diff }}
+                      </view>
+                      <view class="weui-media-box__info__meta right-space">
+                        <image class="weui-media-box__info__meta_icon" src="/images/browse.png"/>
+                        {{ article.view_count }}
+                      </view>
+                      <view class="weui-media-box__info__meta">
+                        <image class="weui-media-box__info__meta_icon" src="/images/reply.png"/>
+                        {{ article.reply_count }}
+                      </view>
+                    </view>
+                </view>
+            </navigator>
+          </repeat>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -81,6 +160,7 @@
 <script>
   import wepy from 'wepy'
   import api from '@/utils/api'
+  import util from '@/utils/util'
 
   export default class ArticleIndex extends wepy.page {
     config = {
@@ -170,12 +250,18 @@
         url: 'articles',
         data: {
           page: this.page,
-          category_id: this.currentCategoryId
+          category_id: this.currentCategoryId,
+          include: 'user,category'
         }
       })
 
       if (articleResponse.statusCode === 200) {
         let articles = articleResponse.data.data
+
+        articles.forEach(function(article) {
+          // 格式化时间
+          article.updated_at_diff = util.diffFormat(article.updated_at, 'YYYY-MM-DD')
+        })
 
         // 如果传入参数 reset 为true，则覆盖 articles, 否则将数据合并到 this.articles
         this.articles = reset ? articles : this.articles.concat(articles)

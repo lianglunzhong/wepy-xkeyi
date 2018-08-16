@@ -59,8 +59,8 @@ export default class extends wepy.app {
       }, {
         pagePath: 'pages/users/index',
         text: 'Me',
-        iconPath: 'images/user.png',
-        selectedIconPath: 'images/user_selected.png'
+        iconPath: 'images/me.png',
+        selectedIconPath: 'images/me_selected.png'
       }],
       color: '#707070',
       backgroundColor: '#ffffff',

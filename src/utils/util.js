@@ -1,19 +1,17 @@
-const formatTime = date => {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 
-  return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+// 格式化时间
+const diffForHumans = (date, format='YYYYMMDD H:mm:ss') => {
+  moment.locale('zh-cn')
+  return moment(date, format).fromNow()
 }
 
-const formatNumber = n => {
-  n = n.toString()
-  return n[1] ? n : '0' + n
+const diffFormat = (date, format='YYYYMMDD H:mm:ss') => {
+  return moment(date).format(format);
 }
 
-module.exports = {
-  formatTime: formatTime
+export default {
+  diffForHumans,
+  diffFormat
 }
