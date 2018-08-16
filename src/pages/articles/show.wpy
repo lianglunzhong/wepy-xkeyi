@@ -1,0 +1,67 @@
+<style lang="less">
+
+</style>
+<template>
+  <view class="page">
+    <view class="page__hd">
+      this is article show page
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+  import util from '@/utils/util'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'xkeyi',
+      navigationBarBackgroundColor: '#fafafa'
+    }
+
+    data = {
+      // 文章数据
+      article: null,
+      // 当前登录用户
+      user: null
+    }
+
+    // 监听页面加载(该事件只会触发一次，切换到其他页面后返回并不会再次触发)
+    async onLoad(options) {
+      // 获取文章详情
+      await this.getArticle(options.id)
+
+      // 获取当前登录用户
+
+      this.$apply()
+    }
+
+    async getArticle(id) {
+      let articleResponse = await api.request({
+        url: 'articles/' + id,
+        data: {
+          include: 'user,availReplies.user'
+        }
+      })
+
+      if (articleResponse.statusCode === 200) {
+        let article = articleResponse.data
+
+        // 格式化时间
+        article.updated_at_diff = util.diffFormat(article.updated_at, 'YYYY-MM-DD')
+
+        article.availReplies.data.forEach(function(reply) {
+          reply.created_at_diff = util.diffFormat(article.created_at, 'YYYY-MM-DD')
+        })
+
+        this.article = article
+        this.$apply()
+      } else {
+
+      }
+      console.log(this.article)
+      return articleResponse
+    }
+  }
+</script>
