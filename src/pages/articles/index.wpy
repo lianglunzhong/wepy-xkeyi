@@ -115,47 +115,54 @@
     <view class="articles-list">
       <view class="weui-panel weui-panel_access">
         <view class="weui-panel__bd">
-          <repeat for="{{ articles }}" wx:key="id" index="index" item="article">
-            <navigator url="/pages/articles/show?id={{ article.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
-                <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-                    <image class="weui-media-box__thumb avatar" src="{{ article.image_url }}" />
-                </view>
-                <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                    <view class="weui-media-box__title article-title">{{ article.title }}</view>
-                    <!-- <view class="weui-media-box__desc article-desc">
-                      <rich-text nodes="{{ article.body }}"></rich-text>
-                    </view> -->
-                    <view class="weui-media-box__info article-info">
-                      <view class="weui-media-box__info__meta right-space">
-                        <image class="weui-media-box__info__meta_icon" src="/images/cate.png"/>
-                        {{ article.category.name }}
+          <block wx:if="{{ articlesLength }}">
+            <repeat for="{{ articles }}" wx:key="id" index="index" item="article">
+              <navigator url="/pages/articles/show?id={{ article.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                  <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                      <image class="weui-media-box__thumb avatar" src="{{ article.image_url }}" />
+                  </view>
+                  <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                      <view class="weui-media-box__title article-title">{{ article.title }}</view>
+                      <!-- <view class="weui-media-box__desc article-desc">
+                        <rich-text nodes="{{ article.body }}"></rich-text>
+                      </view> -->
+                      <view class="weui-media-box__info article-info">
+                        <view class="weui-media-box__info__meta right-space">
+                          <image class="weui-media-box__info__meta_icon" src="/images/cate.png"/>
+                          {{ article.category.name }}
+                        </view>
+                        <view class="weui-media-box__info__meta">
+                          <image class="weui-media-box__info__meta_icon" src="/images/user.png"/>
+                          {{ article.user.name }}
+                        </view>
                       </view>
-                      <view class="weui-media-box__info__meta">
-                        <image class="weui-media-box__info__meta_icon" src="/images/user.png"/>
-                        {{ article.user.name }}
+                      <view class="weui-media-box__info article-info">
+                        <view class="weui-media-box__info__meta right-space">
+                          <image class="weui-media-box__info__meta_icon" src="/images/date.png"/>
+                          {{ article.updated_at_diff }}
+                        </view>
+                        <view class="weui-media-box__info__meta right-space">
+                          <image class="weui-media-box__info__meta_icon" src="/images/browse.png"/>
+                          {{ article.view_count }}
+                        </view>
+                        <view class="weui-media-box__info__meta">
+                          <image class="weui-media-box__info__meta_icon" src="/images/reply.png"/>
+                          {{ article.reply_count }}
+                        </view>
                       </view>
-                    </view>
-                    <view class="weui-media-box__info article-info">
-                      <view class="weui-media-box__info__meta right-space">
-                        <image class="weui-media-box__info__meta_icon" src="/images/date.png"/>
-                        {{ article.updated_at_diff }}
-                      </view>
-                      <view class="weui-media-box__info__meta right-space">
-                        <image class="weui-media-box__info__meta_icon" src="/images/browse.png"/>
-                        {{ article.view_count }}
-                      </view>
-                      <view class="weui-media-box__info__meta">
-                        <image class="weui-media-box__info__meta_icon" src="/images/reply.png"/>
-                        {{ article.reply_count }}
-                      </view>
-                    </view>
-                </view>
-            </navigator>
-          </repeat>
+                  </view>
+              </navigator>
+            </repeat>
 
-          <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
-            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
-          </view>
+            <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot" wx:if="{{ noMoreData }}">
+              <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="weui-loadmore weui-loadmore_line">
+              <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
+            </view>
+          </block>
         </view>
       </view>
     </view>
@@ -195,6 +202,10 @@
       // 当前选中的文类 id
       currentCategoryId() {
         return this.currentCategory.id || 0
+      },
+      // 当前文章列表数据
+      articlesLength() {
+        return this.articles.length > 0
       }
     }
 
