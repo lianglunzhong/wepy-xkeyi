@@ -62,6 +62,12 @@
     .right-space {
       padding-right:20px;
     }
+    &.first {
+      margin-top: 10px;
+    }
+    &.second {
+      margin-top: 0px;
+    }
   }
   .article-title {
     white-space: normal;
@@ -126,7 +132,7 @@
                       <!-- <view class="weui-media-box__desc article-desc">
                         <rich-text nodes="{{ article.body }}"></rich-text>
                       </view> -->
-                      <view class="weui-media-box__info article-info">
+                      <view class="weui-media-box__info article-info first">
                         <view class="weui-media-box__info__meta right-space">
                           <image class="weui-media-box__info__meta_icon" src="/images/cate.png"/>
                           {{ article.category.name }}
@@ -136,7 +142,7 @@
                           {{ article.user.name }}
                         </view>
                       </view>
-                      <view class="weui-media-box__info article-info">
+                      <view class="weui-media-box__info article-info second">
                         <view class="weui-media-box__info__meta right-space">
                           <image class="weui-media-box__info__meta_icon" src="/images/date.png"/>
                           {{ article.updated_at_diff }}

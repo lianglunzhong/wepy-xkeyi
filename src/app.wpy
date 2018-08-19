@@ -35,6 +35,7 @@
 <script>
 import wepy from 'wepy'
 import 'wepy-async-function'
+import api from '@/utils/api'
 
 export default class extends wepy.app {
   config = {
@@ -43,7 +44,9 @@ export default class extends wepy.app {
       'pages/articles/index',
       'pages/articles/show',
       'pages/me/index',
-      'pages/users/index'
+      'pages/users/index',
+      'pages/users/authorized',
+      'pages/replies/create'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -70,7 +73,7 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null
+    refresh: false
   }
 
   constructor () {
@@ -79,7 +82,87 @@ export default class extends wepy.app {
     this.use('promisify')
   }
 
+  // 项目启动
   onLaunch() {
+
+  }
+
+  // 定义在 app.wpy 中的方法是全局方法，在其他页面中可以通过 this.$parent.checkLogin()
+  // 检查用户是否已经登录
+  checkLogin() {
+    return (wepy.getStorageSync('access_tokem') !== '')
+  }
+
+  // 获取当前登录用户信息
+  async getCurrentUser() {
+    let user = null
+
+    // 如果用户未登录
+    if (!this.checkLogin()) {
+      await api.login()
+
+      // 获取用户信息
+      let userResponse = await api.authRequest('user', false)
+      // 状态码为 200， 表示请求成功
+      if (userResponse.statusCode === 200) {
+        user = userResponse.data
+        wepy.setStorageSync('user', user)
+      }
+    } else {
+      // 从缓存中获取用户信息
+      user = wepy.getStorageSync('user')
+      // 登录了但是缓存中没有，请求接口获取
+      if (!user) {
+        let userResponse = await api.authRequest('user', false)
+
+        // 状态码为 200， 表示请求成功
+        if (userResponse.statusCode === 200) {
+          user = userResponse.data
+          wepy.setStorageSync('user', user)
+        }
+      }
+    }
+
+    return user
+  }
+
+  // 获取用户微信信息
+  async getUserInfo() {
+    // 未授权，直接返回 null
+    if (!this.getSetting()) {
+      return null
+    }
+
+    // 从缓存中获取
+    let userInfo = wepy.getStorageSync('userInfo')
+    if (!userInfo) {
+      let res = await wepy.getUserInfo()
+
+      userInfo.avatar = res.userInfo.avatarUrl
+      userInfo.name = res.userInfo.nickName
+
+      // 缓存用户信息
+      wepy.setStorageSync('userInfo', userInfo)
+
+      // 更新用户信息到数据库
+      api.authRequest({
+        url: 'user',
+        method: 'PUT',
+        data: userInfo
+      }, false)
+    }
+
+    return userInfo
+  }
+
+  // 查看是否授权
+  async getSetting() {
+    let res = await wepy.getSetting()
+    if (res.authSetting['scope.userInfo']) {
+      return true
+    }
+
+    return false
   }
 }
 </script>

@@ -1,0 +1,120 @@
+<style lang="less">
+  .page__hd {
+    padding: 20px 0px;
+    .page-title {
+      padding: 10px 15px;
+      font-size: 20px;
+    }
+    .content {
+      height: 120px;
+    }
+  }
+</style>
+<template>
+  <view class="page">
+    <view class="page__hd">
+      <form bindsubmit="submit" report-submit="true">
+        <view class="page-title">{{ title }}</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <textarea class="weui-textarea content" placeholder="请输入留言内容" name="content"/>
+            </view>
+          </view>
+        </view>
+        <view class="weui-btn-area">
+          <button class="weui-btn" type="primary" formType="submit">留言</button>
+        </view>
+      </form>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  export default class ReplyCreate extends wepy.page {
+    config = {
+      navigationBarTitleText: 'xkeyi',
+      navigationBarBackgroundColor: '#fafafa'
+    }
+
+    data = {
+      // 文章
+      id: null,
+      title: null,
+      // 用户微信信息
+      userInfo: null,
+      // 页面是否已经加载（onLoad）
+      isLoaded: false
+    }
+
+    async onLoad(options) {
+      this.id = options.id
+      this.title = options.title
+
+      // 获取用户是否授权
+      let res = await this.$parent.getSetting()
+
+      if (!res) {
+        wepy.navigateTo({
+          url: '/pages/users/authorized'
+        })
+      }
+
+      this.isLoaded = true
+      this.$apply()
+    }
+
+    async onShow() {
+      // 获取用户信息
+      this.userInfo = wepy.getStorageSync('userInfo')
+
+      if (this.isLoaded && !this.userInfo) {
+        wepy.navigateBack()
+      }
+    }
+
+    // 提交表单
+    async submit(e) {
+      // 表单 ID
+      let formId = e.detail.formId
+
+      let formData = e.detail.value
+      formData.from_id = formId
+
+      if (!formData.content) {
+        wepy.showToast({
+          title: '请填写留言内容',
+          icon: 'none',
+          duration: 2000
+        })
+
+        return
+      }
+
+      let createResponse = await api.authRequest({
+        url: 'articles/' + this.id + '/replies',
+        method: 'POST',
+        data: formData
+      })
+
+      if (createResponse.statusCode === 201) {
+        // 设置返回时是否重新获取文章数据
+        this.$parent.globalData.refresh = true
+        this.$apply()
+
+        // 提示发布成功
+        wepy.showToast({
+          title: '留言成功',
+          icon: 'success'
+        })
+
+        setTimeout(function() {
+          wepy.navigateBack()
+        }, 2000)
+      }
+    }
+  }
+</script>

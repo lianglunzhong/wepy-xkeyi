@@ -1,10 +1,155 @@
 <style lang="less">
-
+  .article-page {
+    background-color: #ffffff;
+    .page__hd {
+      padding: 20px 15px;
+    }
+    .page__desc {
+      font-size: 0px;
+      .page__desc-auth {
+        display: inline-block;
+        font-size: 14px;
+        &.auth-name {
+          margin: auto 15px auto 10px;
+          color: #576b95;
+        }
+      }
+    }
+    .page__bd {
+      padding-bottom: 20px;
+    }
+    .article-footer {
+      padding: 0 15px;
+      .article-view_count {
+        color:#888888;
+        text-align:left;
+        font-size:14px;
+      }
+    }
+  }
+  .reply-page {
+    padding: 20px 15px;
+    .view_count_page {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      .good_reply_title {
+        color:#888888;
+      }
+      .leave_reply {
+        color: #576b95;
+      }
+    }
+    .write_count_page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      .leave_reply {
+        color: #576b95;
+      }
+    }
+    .reply-panel {
+      display: flex;
+      padding-top: 20px;
+      .reply-panel-left {
+        flex: 0 0 50px;
+        .user-avatar {
+          margin-top: 5px;
+          .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 3px;
+          }
+        }
+      }
+      .reply-panel-right {
+        flex: 1;
+        font-size: 14px;
+        .user-name {
+          color: #888888;
+        }
+        .reply-delete_btn {
+          color: #576b95;
+          margin-buttom: 8px;
+        }
+        .auth-name-before {
+          display: inline-block;
+          vertical-align:middle;
+          width: 2px;
+          height: 16px;
+          margin-right: 5px;
+          background-color: #1aad19;
+        }
+        .auth-name {
+          display: inline-block;
+          vertical-align:middle;
+          color: #888888;
+        }
+        .reply-content {
+          padding: 5px 0px;
+        }
+      }
+    }
+  }
 </style>
 <template>
-  <view class="page">
+  <view class="page article-page">
     <view class="page__hd">
-      this is article show page
+      <view class="page__title">{{ article.title }}</view>
+      <view class="page__desc">
+        <view class="page__desc-auth">原创：</view>
+        <navigator url="" class="page__desc-auth auth-name" hover-class="other-navigator-hover" open-type="redirect">{{ article.user.name}}</navigator>
+        <view class="page__desc-auth">{{ article.updated_at_diff }}</view>
+      </view>
+    </view>
+    <view class="page__bd">
+      <view class="weui-article">
+        <rich-text nodes="{{ article.body }}"></rich-text>
+      </view>
+      <view class="article-footer">
+        <view class="article-view_count">阅读 {{article.view_count}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="page reply-page">
+    <view class="reply-page__hd">
+      <block wx:if="{{ article.reply_count }}">
+        <view class="view_count_page">
+          <view class="good_reply_title">精选留言</view>
+          <navigator wx:if="{{ isLoaded }}" url="/pages/replies/create?id={{ article.id }}&title={{ article.title }}" class="leave_reply" hover-class="navigator-hover" open-type="navigate">写留言</navigator>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="write_count_page">
+          <navigator wx:if="{{ isLoaded }}" url="/pages/replies/create?id={{ article.id }}&title={{ article.title }}" class="leave_reply" hover-class="navigator-hover" open-type="navigate">写留言</navigator>
+        </view>
+      </block>
+    </view>
+    <view class="reply-page__bd">
+      <repeat for="{{ replies }}" key="id" index="index" item="reply">
+        <view class="reply-panel">
+          <view class="reply-panel-left">
+            <view class="user-avatar">
+              <image class="avatar" src="{{ reply.user.avatar }}"></image>
+            </view>
+          </view>
+          <view class="reply-panel-right">
+            <view class="user-name">{{ reply.user.name }}</view>
+            <view class="reply-content">
+              <rich-text nodes="{{ reply.content }}"></rich-text>
+            </view>
+            <view wx:if="{{ reply.user_id === user.id }}" class="reply-delete_btn" @tap="destroy({{ article.id }}, {{ reply.id }})">删除</view>
+            <block wx:if="{{ reply.reply_content }}">
+              <view class="auth-name-before"></view>
+              <view class="auth-name">作者</view>
+              <view class="reply-content">
+                <rich-text nodes="{{ reply.reply_content }}"></rich-text>
+              </view>
+            </block>
+          </view>
+        </view>
+      </repeat>
     </view>
   </view>
 </template>
@@ -14,7 +159,7 @@
   import api from '@/utils/api'
   import util from '@/utils/util'
 
-  export default class Index extends wepy.page {
+  export default class ArticleShow extends wepy.page {
     config = {
       navigationBarTitleText: 'xkeyi',
       navigationBarBackgroundColor: '#fafafa'
@@ -22,21 +167,66 @@
 
     data = {
       // 文章数据
+      id: null,
       article: null,
       // 当前登录用户
-      user: null
+      user: null,
+      // 文章留言
+      replies: null,
+      isLoaded: false
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+      async destroy(articleId, replyId) {
+        // 确认是否删除
+        let res = await wepy.showModal({
+          title: '确认删除',
+          content: '确认删除该留言吗？',
+          confirmText: '删除',
+          cancelText: '取消'
+        })
+
+        // 点击取消后返回
+        if (!res.confirm) {
+          return
+        }
+
+        let deleteResponse = await api.authRequest({
+          url: 'articles/' + articleId + '/replies/' + replyId,
+          method: 'DELETE'
+        })
+
+        // 删除成功
+        if (deleteResponse.statusCode === 204) {
+          wepy.showToast({
+            title: '删除成功',
+            icon: 'success',
+            duration: 2000
+          })
+
+          this.replies = this.replies.filter((reply) => reply.id !== replyId)
+          this.$apply()
+        }
+      }
     }
 
     // 监听页面加载(该事件只会触发一次，切换到其他页面后返回并不会再次触发)
     async onLoad(options) {
+      this.id = options.id
       // 获取文章详情
-      await this.getArticle(options.id)
-
+      await this.getArticle(this.id)
       // 获取当前登录用户
-
+      let user = await this.$parent.getCurrentUser()
+      this.user = user
+      this.isLoaded = true
       this.$apply()
     }
 
+    // 获取文章详情
     async getArticle(id) {
       let articleResponse = await api.request({
         url: 'articles/' + id,
@@ -49,19 +239,24 @@
         let article = articleResponse.data
 
         // 格式化时间
-        article.updated_at_diff = util.diffFormat(article.updated_at, 'YYYY-MM-DD')
+        article.updated_at_diff = util.diffForHumans(article.updated_at, 'YYYY-MM-DD')
 
         article.availReplies.data.forEach(function(reply) {
           reply.created_at_diff = util.diffFormat(article.created_at, 'YYYY-MM-DD')
         })
 
         this.article = article
+        this.replies = article.availReplies.data
         this.$apply()
-      } else {
-
       }
-      console.log(this.article)
+
       return articleResponse
+    }
+
+    async onShow() {
+      if (this.$parent.globalData.refresh) {
+        await this.getArticle(this.id)
+      }
     }
   }
 </script>
