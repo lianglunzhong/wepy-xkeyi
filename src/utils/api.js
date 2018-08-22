@@ -1,7 +1,9 @@
 import wepy from 'wepy'
 
 // 服务器接口地址
-const host = "http://xkeyi.test/api"
+// const host = "http://xkeyi.test/api"
+const api_host = __BASE_URL__ + '/api'
+const host = __BASE_URL__
 
 // 普通请求
 const request = async (options, showLoading = true) => {
@@ -18,7 +20,7 @@ const request = async (options, showLoading = true) => {
   }
 
   // 拼接请求的地址
-  options.url = host + '/' + options.url
+  options.url = api_host + '/' + options.url
 
   // 调用小程序的 request 方法
   let response = ''
@@ -84,7 +86,7 @@ const login = async () => {
 const refreshToken = async (accessToken) => {
   // 请求刷新接口
   let refreshResponse = await wepy.request({
-    url: host + '/' + 'authorizations/current',
+    url: api_host + '/' + 'authorizations/current',
     method: 'PUT',
     header: {
       'Authorization': 'Bearer ' + accessToken
@@ -145,8 +147,9 @@ const authRequest = async (options, showLoading = true) => {
 }
 
 export default {
-    request,
-    login,
-    refreshToken,
-    authRequest
+  host,
+  request,
+  login,
+  refreshToken,
+  authRequest
 }

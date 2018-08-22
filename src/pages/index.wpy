@@ -45,7 +45,7 @@
     <view class="page__hd page-avatar">
       <view class="weui-panel__bd avatar-box">
         <view class="avatar-item">
-          <image class="weui-media-box__thumb avatar" src="https://lccdn.phphub.org/uploads/avatars/24929_1529996824.gif?imageView2/1/w/200/h/200"></image>
+          <image class="weui-media-box__thumb avatar" src="{{ avatar }}"></image>
         </view>
       </view>
     </view>
@@ -62,11 +62,20 @@
 
 <script>
   import wepy from 'wepy'
+  import api from '@/utils/api'
 
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: 'xkeyi',
       navigationBarBackgroundColor: '#fafafa'
+    }
+
+    data = {
+      avatar: null
+    }
+
+    onLoad() {
+      this.avatar = api.host + '/images/static/index.gif'
     }
 
     onShareAppMessage (res) {

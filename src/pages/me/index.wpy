@@ -1,21 +1,122 @@
 <style lang="less">
+  .page-avatar {
+    padding-top: 40px;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    background: url('https://xkeyi.top/images/static/meihua.jpg');
+    background-size: 100%;
+    &:after {
+      content: ' ';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://xkeyi.top/images/static/meihua.jpg');
+      background-size: 100%;
+      filter: blur(1px);
+    }
+    .avatar-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .avatar-item {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #E5E5E5;
+        box-shadow: 0 0 0 5px hsla(0,0%,100%,.1), 0 0 5px 4px rgba(0,0,0,.1);
+        padding:10px;
+        z-index: 1;
+        .avatar {
+          border-radius: 50%;
+          border: 1px solid #E5E5E5;
+        }
+      }
+    }
+  }
 
+  .page-navabar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    background: #fff;
+    .article-content {
+      padding: 20px 15px;
+    }
+  }
 </style>
 <template>
   <view class="page">
-    <view class="page__hd">
-      this is about me page
+
+    <view class="page__hd page-avatar">
+      <view class="weui-panel__bd avatar-box">
+        <view class="avatar-item">
+          <image class="weui-media-box__thumb avatar" hidden="{{activeIndex != 0}}" src="{{ llz_avatar }}"></image>
+          <image class="weui-media-box__thumb avatar" hidden="{{activeIndex != 1}}" src="{{ xkeyi_avatar }}"></image>
+        </view>
+      </view>
     </view>
+
+    <view class="page__bd page-navabar">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content article-content" hidden="{{activeIndex != 0}}">选项一的内容</view>
+                    <view class="weui-tab__content article-content" hidden="{{activeIndex != 1}}">选项二的内容</view>
+                </view>
+            </view>
+        </view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  const sliderWidth = 96 // 需要设置slider的宽度，用于计算中间位置
 
   export default class MeIndex extends wepy.page {
     config = {
       navigationBarTitleText: 'xkeyi',
       navigationBarBackgroundColor: '#fafafa'
+    }
+
+    data = {
+      tabs: ['关于作者', '关于 xkeyi.top'],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      llz_avatar: null,
+      xkeyi_avatar: null,
+      avatar_background: null
+    }
+
+    methods = {
+      tabClick (e) {
+        this.sliderOffset = e.currentTarget.offsetLeft
+        this.activeIndex = e.currentTarget.id
+      }
+    }
+
+    async onLoad () {
+      this.llz_avatar = api.host + '/images/static/llz.jpg'
+      this.xkeyi_avatar = api.host + '/images/static/xkeyi.jpg'
+      this.avatar_background = api.host + '/images/static/meihua.jpg'
+
+      let res = await wepy.getSystemInfo()
+
+      this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2
+      this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex
+
+      this.$apply()
     }
   }
 </script>
