@@ -46,6 +46,15 @@
     .article-content {
       padding: 20px 15px;
     }
+    .weui-tab__panel {
+      padding:50px 0px 20px 0px;
+      overflow:visible;
+      height:auto;
+      background:#fff;
+      .xkeyi {
+        padding-left: 25px;
+      }
+    }
   }
 </style>
 <template>
@@ -69,8 +78,12 @@
                     <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
                 </view>
                 <view class="weui-tab__panel">
-                    <view class="weui-tab__content article-content" hidden="{{activeIndex != 0}}">选项一的内容</view>
-                    <view class="weui-tab__content article-content" hidden="{{activeIndex != 1}}">选项二的内容</view>
+                    <view class="weui-tab__content article-content" hidden="{{activeIndex != 0}}">
+                      <rich-text nodes="{{ llz_body }}"></rich-text>
+                    </view>
+                    <view class="weui-tab__content article-content xkeyi" hidden="{{activeIndex != 1}}">
+                      <rich-text nodes="{{ xkeyi_body }}"></rich-text>
+                    </view>
                 </view>
             </view>
         </view>
@@ -96,7 +109,9 @@
       sliderLeft: 0,
       llz_avatar: null,
       xkeyi_avatar: null,
-      avatar_background: null
+      avatar_background: null,
+      llz_body: null,
+      xkeyi_body: null
     }
 
     methods = {
@@ -116,7 +131,19 @@
       this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2
       this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex
 
+      await this.getAboutMe()
+
       this.$apply()
+    }
+
+    async getAboutMe() {
+      let articleResponse = await api.request('article/about_me')
+
+      if (articleResponse.statusCode === 200) {
+        this.llz_body = articleResponse.data.data[0].body
+        this.xkeyi_body = articleResponse.data.data[1].body
+        this.$apply()
+      }
     }
   }
 </script>
